@@ -13,6 +13,7 @@ const PAGE_SIZE = 100;
 //this has no effect at runtime, but will help us catch
 //errors while coding.
 const PREV_PAGE_BUTTON = /** @type {HTMLButtonElement} */(document.querySelector("#prev-page"));
+// selects the first element has attribute id=prev-page
 const NEXT_PAGE_BUTTON = /** @type {HTMLButtonElement} */(document.querySelector("#next-page"));
 
 //reference to the <input id="name-filter">
@@ -50,7 +51,54 @@ let state = {
 //TODO: implement functions to render the current state
 //to the page as new <tr> and <td> elements within the
 //<tbody> element that is already in the page.
+// create a new dom element, if className is supplied it's going to set the class attribute so that we can create style classes 
+/**
+ * Creates and returns a new DOM element
+ * @param {string} name 
+ * @param {*} value 
+ * @param {string} className 
+ */
+function createElem(name, value, className) {
+    let elem = document.createElement(name);
+    elem.textContent = value;
+    if (className) {
+        elem.className = className;
+    }
+    return elem;
+}
 
+/**
+ * 
+ * @param {Object} record 
+ */
+
+function renderTableRow(record) {
+    let tr = document.createElement("tr");
+    tr.appendChild(createElem("td", record.name, ""))
+    tr.appendChild(createElem("td", record.sex, ""))
+    tr.appendChild(createElem("td", record.count, "text-right"));
+    return tr;
+}
+
+function render(state){
+    let tbody = document.querySelector("tbody");
+    tbody.textContent = "";
+
+    let totalPages = Math.ceil(state.records.length / PAGE_SIZE);
+
+    let startingIndex = state.currentPage * PAGE_SIZE;
+    let pageRecords = state.records.slice(startingIndex, startingIndex + PAGE_SIZE);
+    for(let i = 0; i < pageRecords.length; i++){
+        tbody.appendChild(renderTableRow(pageRecords[i]));
+    }
+
+    CURRENT_PAGE.textContent = state.currentPage + 1;
+    TOTAL_PAGES.textContent = totalPages.toString();
+    PREV_PAGE_BUTTON.disabled = state.currentPage === 0;
+    NEXT_PAGE_BUTTON.disabled = state.currentPage === totalPages - 1;
+}
+
+render(state);
 
 
 
@@ -58,9 +106,32 @@ let state = {
 //prev/next page buttons, mutate the state.currentPage,
 //and re-render
 
+// event listener is a function. We want the browser to call this function when the event happens.
+// use the elemtn you want to catch the event on
+NEXT_PAGE_BUTTON.addEventListener("click", function() {
+    //console.log("next page button pressed");
+    // don't use onClick property, it will delete all previous event listners
+    state.currentPage++;
+    render(state);
+});
+
+PREV_PAGE_BUTTON.addEventListener("click", function(){
+    //console.log("prev page button pressed");
+    state.currentPage--;
+    render(state);
+})
+
 
 //TODO: listen for the "input" event raised by the
 //name filter <input> element, filter the state.records,
 //and re-render
-
+NAME_FILTER_INPUT.addEventListener("input", function(){
+    let q = NAME_FILTER_INPUT.value.trim().toLowerCase();
+    //console.log("input event raised", q);
+    state.records = BABYNAMES.filter(function(record){
+        return record.name.toLowerCase().startsWith(q);
+    })
+    state.currentPage = 0;
+    render(state);
+})
 
