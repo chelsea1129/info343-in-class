@@ -9,24 +9,74 @@ body {
 }
 
 /* TODO: tell the browser to include borders and padding in size calculations */
+* {
+    box-sizing: border-box;
+    /* browsers don't include width calculation. Tells browser when I say element is 30%
+    we have the padding as well. */
+}
 
 /* TODO: constrain the width of <div class="container"> elements to a max of 1140px
 and keep the content horizontally-centered with 1rem of padding on left/right */
+.container{
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    /* 0 is for top/bottom; 1rem is for left/right */
+}
 
 /* TODO: set background image of the <header> to `header.jpg` in the `img` directory,
 and set text color to white, and ensure the height is at least 200px */
+header{
+    background-color: #034975;
+    color: #FFF;
+}
+
 
 /* TODO: set the font size of the <h1> in the <header> to 5rem
 and the font weight to 200 */
+header h1{
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 200;
+    /* font-weight 400 is normal */
+}
+
+header .page-title {
+    flex: 1;
+}
+
+header .lead {
+    display: none;
+    /* takes it out of the layout completely */
+}
 
 /* TODO: set the height of the SVG icon to 3rem */
+header svg{
+    height: 2rem;
+    fill: currentColor;
+}
 
 /* TODO: make the color of the hyperlink icon white instead of blue
 and when it has focus/hover change the color to #FF9800, 
 from Material Design Color Palette: 
 https://material.io/guidelines/style/color.html#color-color-palette */
+header a {
+    color: #FFF;
+    transition: all 1s;
+}
+
+/* pseudo selector. select the element when in particular state */
+/* focus: textboxes, keyboard focus */
+header a:hover, header a:focus {
+    color: #FF9800;
+}
 
 /* TODO: make the <div class="col"> elements layout side-by-side instead of stacked */
+header .container{
+    display: flex; 
+    /* immediate child element got affected. h1 is no longer a direct child of the container */
+    align-items: center;
+}
 
 .col {
     background-color: #FF9800; 
@@ -34,8 +84,104 @@ https://material.io/guidelines/style/color.html#color-color-palette */
     min-height: 150px;
     font-weight: 600;
     color: #FFF;
+    display: flex;
+    align-items: center; 
+    /* vertical */
+    justify-content: center;
+    /* horizontal */
+    flex: 1;
 }
+
+
 
 /* TODO: set the background color of every-other <div class="col"> element 
 to #E65100 so that we can see where the column begin/end */
+/* .row{
+    display: flex;
+    flex-direction: row-reverse;
+} */
+
+/* select specific ones */
+.col:nth-of-type(odd) {
+    background-color: #E65100;
+}
+
+nav{
+    background-color: #034975;
+    color: #FFF;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    transform: translateX(-250px);
+    /* translating its position to -250px. Shift the element to the left, off-screen.*/
+    transition: transform 500ms;
+    z-index: 1; 
+}
+
+main, header {
+    transition: transform 500ms;
+}
+
+header button {
+    color: #FFF;
+    background-color: transparent;
+    border: none;
+}
+
+.drawer-open nav {
+    transform: translateX(0);
+}
+
+.drawer-open header,
+.drawer-open main{
+    transform: translateX(250px);
+    /* filter: blur(2px); */
+}
+
+/* like if-statement: if the condition is true, apply all these styles */
+/* 760px common break-point */
+@media (min-width: 760px) {
+    header {
+        background-image: url(../img/header.jpg);
+        background-size: cover;
+        min-height: 200px;
+    }
+
+    header .lead{
+        display: inline;
+    }
+
+    header h1{
+        font-size: 5rem;
+    }
+
+    header svg {
+        height: 3rem;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .col {
+        flex: 50%;
+    }
+}
+
+@media (min-width: 992px) {
+    .col {
+        flex: 33%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .col {
+        flex: 1;
+    }
+}
+
+
 

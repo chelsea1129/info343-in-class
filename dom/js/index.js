@@ -72,11 +72,11 @@ function createElem(name, value, className) {
  * @param {Object} record 
  */
 
-function renderTableRow(record) {
+function renderTableRow(record){
     let tr = document.createElement("tr");
     tr.appendChild(createElem("td", record.name, ""))
     tr.appendChild(createElem("td", record.sex, ""))
-    tr.appendChild(createElem("td", record.count, "text-right"));
+    tr.appendChild(createElem("td", record.count, "text-right"))
     return tr;
 }
 

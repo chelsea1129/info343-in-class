@@ -58,6 +58,47 @@ returned a truthy value
 //value in the `sex` property of each object in
 //the array
 
+// function isMale(record){
+//     return record.sex === "M";
+// }
+
+// function isFemale(record){
+//     return record.sex === "F";
+// }
+
+function isSex(sex){
+    let lowerSex = sex.toLowerCase();
+    return function(record){
+        let lowerRecordSex = record.sex.toLowerCase();
+        return lowerRecordSex === lowerSex;
+    }
+}
+
+let isMale = isSex("M");
+let isFemale = isSex("F");
+let isUndeclared = isSex("U");
+
+
+// function is a value. Pass isMale as a parameter. Reference to the isMale function. 
+// %s is for string
+let males = BABYNAMES.filter(isMale);
+console.log("there are %d male records", males.length);
+
+let females = BABYNAMES.filter(isFemale);
+console.log("there are %d female records", females.length);
+
+function isMyName(name){
+    let lowerName = name.toLowerCase();
+    return function(record){
+        let lowerRecordName = record.name.toLowerCase();
+        return lowerName === lowerRecordName;
+    }
+};
+
+let myname = isMyName("Chelsea");
+
+let testName = BABYNAMES.filter(myname);
+console.log(testName);
 
 
 
@@ -76,12 +117,35 @@ the second.
 //TODO: create comparator functions we can use
 //to sort the BABYNAMES array based on count
 //and name
+function byCount(record1, record2){
+    return record1.count - record2.count;
+}
+
+function byName(record1, record2){
+    return record1.name.localeCompare(record2.name);
+}
+
+let sortedFemales = females.sort(byCount);
+let sortedMales = males.sort(byCount);
+console.log("least popular female name:", sortedFemales[0]);
+
+console.log("least popular male name:", sortedMales[0]);
 
 
 
 //TODO: create a descending() function that
 //wraps a comparator function to perform a
 //descending sort instead of an ascending sort
+function descending(comparator){
+    return function(record1, record2){
+        return -(comparator(record1, record2));
+    }
+}
+// why not return -(comparator(record1, record2)) directly without return function?
+// does this mean that the second time we call the function would enter the second return?
+
+let popularFemales = females.sort(descending(byCount));
+console.log("most popular female name:", popularFemales[0]);
 
 
 
@@ -94,6 +158,9 @@ up to but not include.
 
 //TODO: use .slice() to get the top 10 female baby 
 //name records
+
+let top3FemaleNames = popularFemales.slice(0,3);
+console.log(top3FemaleNames);
 
 
 /* MAPPING
@@ -109,10 +176,27 @@ the output array.
 //TODO: use .map() to transform the top 10 female
 //baby name records array into an array of strings
 //containing just the names themselves
+function pluckName(record){
+    return record.name;
+}
+let top3FemaleJustNames = top3FemaleNames.map(pluckName);
+console.log(top3FemaleJustNames);
 
 
 //TODO: use .map() to transform those top 10
 //names into all lower case
+function lowerTopFemaleName(record){
+    return record.name.toLowerCase();
+}
+let top3FemaleLowerNames = top3FemaleNames.map(lowerTopFemaleName);
+console.log(top3FemaleNames.map(lowerTopFemaleName).join(","));
+
+let results = BABYNAMES.filter(isFemale)
+                        .sort(descending(byCount)).slice(0,10)
+                        .map(pluckName)
+                        .join(", ");
+
+console.log(results);
 
 
 
@@ -149,19 +233,30 @@ function randomIntegers(amount, max) {
  * @returns {number} - the updated accumulator
  */
 function sum(accumulator, num) {
-    //TODO: implement this function
+    return accumulator + num;
 }
 
 //TODO: use randomIntegers() to generate an array of 
 //random integers and use .reduce() with sum*() to
 //calculate the sum of those integers.
+let randomNums = randomIntegers(100,500);
+
+console.log(randomNums.reduce(sum, 0));
 
 
 //TODO: now define a max() reducer that reduces
 //an array of numbers to their maximum value.
 //Then use that with .reduce() to find the 
 //maximum value in an array of random integers.
+function max(maxNum, num){
+    if(maxNum > num){
+        return maxNum;
+    } else {
+        return num;
+    }
+}
 
+console.log(randomNums.reduce(max, randomNums[0]));
 
 
 //TODO: given that a JavaScript object is really
@@ -170,6 +265,7 @@ function sum(accumulator, num) {
 //set (e.g., you can't add the same key twice),
 //create a reducer that calculates how many times
 //a given baby name appears in the BABYNAMES array.
+
 //Some names are used for both males and females, so
 //those names will have a count of 2, while names
 //used exclusively for males or females will have
@@ -188,9 +284,33 @@ function sum(accumulator, num) {
  * @param {BabyNameRecord} record 
  * @returns {Object}
  */
-function countNames(nameMap, record) {
-    //TODO: implement this function
+
+function countNames(nameMap, target){
+    return function mapPush(nameMap){
+        if(nameMap.hasOwnProperty(target)){
+            nameMap[target.name]++;
+        }else{
+            nameMap[target] = 0;
+        }
+        return nameMap;
+    }
 }
+
+function countChelsea(nameMap, target){
+    if(nameMap.hasOwnProperty(target.name)){
+        nameMap[target.name]++;
+    }else if(target.name == "Chelsea"){
+        nameMap[target.name] = 1;
+    }
+
+    return nameMap;
+}
+
+console.log(BABYNAMES.reduce(countChelsea,{}));
+
+// array.reduce(reducer, accumulator)
+// reducer takes in accumulator as initial value and return accumulator -> accumulator is the count of name appearances
+// what function should reducer be? sum accumulator -> count #existed + accumulator if the key matches target
 
 //TODO: use the countNames reducer to generate
 //an object containing all the distinct names 
